@@ -1,17 +1,30 @@
-// This file is automatically compiled by Webpack, along with any other files
-// present in this directory. You're encouraged to place your actual application logic in
-// a relevant structure within app/javascript and only use these pack files to reference
-// that code so it'll be compiled.
-
 require("@rails/ujs").start()
 require("turbolinks").start()
 require("@rails/activestorage").start()
 require("channels")
 
+import axios from 'axios';
 
-// Uncomment to copy all static images under ../images to the output folder and reference
-// them with the image_pack_tag helper in views (e.g <%= image_pack_tag 'rails.png' %>)
-// or the `imagePath` JavaScript helper below.
-//
-// const images = require.context('../images', true)
-// const imagePath = (name) => images(name, true)
+require("../index")
+
+console.log(1234)
+
+axios.get('/posts.json')
+  .then(response => {
+    console.log(response.data);
+  })
+  .catch(error => {
+    console.log(error)
+  });
+
+axios.interceptors.request.use((config) => {
+  console.log(5678)
+  if(config.method == 'post' || config.method == 'put' ||
+      config.method == 'patch' || config.method == 'delete') {
+    const csrf_token = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    config.headers['X-CSRF-Token'] = csrf_token;
+  }
+  return config;
+}, (error) => {
+  return Promise.reject(error);
+});
